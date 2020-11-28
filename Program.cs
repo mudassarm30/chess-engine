@@ -32,6 +32,7 @@ namespace Originsoft
                 else if (inputString.StartsWith("position"))
                 {
                     inputPosition(inputString);
+                    Board.Print();
                 }
                 else if (inputString.StartsWith("go"))
                 {
@@ -90,11 +91,19 @@ namespace Originsoft
             }
         }
         public static void inputGo()
-        {  
-
+        {
+            var strmoves = Board.GetAllPossibleMoves();
+            var moves = strmoves.Split(" ");
+            var rand = new Random(DateTimeOffset.UtcNow.Millisecond);
+            var move = moves[rand.Next(0, moves.Length)];
+            Board.MakeMove(move);
+            Console.WriteLine("info possible moves: " + strmoves);
+            Console.WriteLine("bestmove " + move);
+            Board.Print();
         }
         public static void inputQuit()
         {
+            
         }
         public static void inputPrint()
         {
