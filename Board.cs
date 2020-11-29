@@ -58,7 +58,195 @@ namespace Originsoft
                     }
                 }
             }
-            return possibilities.Trim();
+
+            return FilterPossibleMoves(possibilities.Trim()).Trim();
+        }
+
+        private static string FilterPossibleMoves(string moves)
+        {
+            var possibleMoves = moves.Split(" ");
+            var filteredMoves = "";
+
+            foreach(var possibleMove in possibleMoves)
+            {
+                var move = possibleMove.Trim();
+
+                if(TryMove(move))
+                {
+                    filteredMoves += (move + " ");
+                }
+            }
+
+            return filteredMoves;
+        }
+
+        private static Boolean TryMove(string move)
+        {
+            var _WhiteToMove = WhiteToMove;
+            var _CWK = CWK;
+            var _CWQ = CWQ;
+            var _CBK = CBK;
+            var _CBQ = CBQ;
+            var _CB = CB;
+            var _CW = CW;
+
+            var clonedBoard = (String[,])ChessBoard.Clone();
+
+            MakeMove(move);
+
+            var possible = true;
+
+            if ((_WhiteToMove && KingInCheck("K")) || !_WhiteToMove && KingInCheck("k"))
+                possible = false;
+            
+            switch(move)
+            {
+                case "e1g1":
+                    if (KingInCheck("K", "e1") || KingInCheck("K", "f1") || KingInCheck("K", "g1"))
+                        possible = false;
+                    break;
+                case "e1c1":
+                    if (KingInCheck("K", "e1") || KingInCheck("K", "d1") || KingInCheck("K", "c1"))
+                        possible = false;
+                    break;
+                case "e8g8":
+                    if (KingInCheck("k", "e8") || KingInCheck("k", "f8") || KingInCheck("k", "g8"))
+                        possible = false;
+                    break;
+                case "e8c8":
+                    if (KingInCheck("k", "e8") || KingInCheck("k", "d8") || KingInCheck("k", "c8"))
+                        possible = false;
+                    break;
+            }
+            
+            ChessBoard = clonedBoard;
+            WhiteToMove = _WhiteToMove;
+            CWK = _CWK;
+            CWQ = _CWQ;
+            CBK = _CBK;
+            CBQ = _CBQ;
+            CB = _CB;
+            CW = _CW;
+
+            return possible;
+        }
+
+        public static Boolean KingInCheck(string king)
+        {
+            for (var r = 0; r < 8; r++)
+            {
+                for (var c = 0; c < 8; c++)
+                {
+                    var position = FromCoordinates(r, c);
+                    var piece = GetPiece(r, c);
+
+                    if(king == piece)
+                    {
+                        return KingInCheck(king, position, r, c, 0, 0, 0);
+                    }
+                }
+            }
+
+            return false;
+        }
+
+        private static Boolean KingInCheck(string king, string pos)
+        {
+            var coords = ToCoordinates(pos);
+            return KingInCheck(king, pos, coords.Item1, coords.Item2, 0, 0, 0);
+        }
+
+        private static Boolean KingInCheck(string king, string pos, int r, int c, int dr, int dc, int dist)
+        {
+
+            if (r < 0 || r > 7 || c < 0 || c > 7)
+                return false;
+
+            var pot = FromCoordinates(r, c);
+
+            if(pos == pot)
+            {
+                return KingInCheck(king, pos, r + 1, c, 1, 0, dist + 1) || KingInCheck(king, pos, r - 1, c, -1, 0, dist + 1) ||
+                       KingInCheck(king, pos, r, c + 1, 0, 1, dist + 1) || KingInCheck(king, pos, r, c - 1, 0, -1, dist + 1) ||
+
+                       KingInCheck(king, pos, r + 1, c + 1, 1, 1, dist + 1) || KingInCheck(king, pos, r - 1, c + 1, -1, 1, dist + 1) ||
+                       KingInCheck(king, pos, r + 1, c - 1, 1, -1, dist + 1) || KingInCheck(king, pos, r - 1, c - 1, -1, -1, dist + 1) ||
+
+                       KingInCheck(king, pos, r + 1, c + 2, 1, 2, dist + 1) || KingInCheck(king, pos, r + 1, c - 2, 1, -2, dist + 1) ||
+                       KingInCheck(king, pos, r - 1, c + 2, -1, 2, dist + 1) || KingInCheck(king, pos, r - 1, c - 2, -1, -2, dist + 1) ||
+                       KingInCheck(king, pos, r + 2, c + 1, 2, 1, dist + 1) || KingInCheck(king, pos, r + 2, c - 1, 2, -1, dist + 1) ||
+                       KingInCheck(king, pos, r - 2, c + 1, -2, 1, dist + 1) || KingInCheck(king, pos, r - 2, c - 1, -2, -1, dist + 1);
+
+            }
+            else
+            {
+                var piece = GetPiece(pot);
+
+                if(king == "K")
+                {
+                    if (((Math.Abs(dr) == 1 && Math.Abs(dc) == 2) || (Math.Abs(dr) == 2 && Math.Abs(dc) == 1)) && piece == "n")
+                        return true;
+
+                    if((dr == 0 && Math.Abs(dc) == 1) || (Math.Abs(dr) == 1 && dc == 0))
+                    {
+                        if (piece == "q" || piece == "r")
+                            return true;
+
+                        if (dist == 1 && piece == "k")
+                            return true;
+
+                        if (piece == " ")
+                            return KingInCheck(king, pos, r + dr, c + dc, dr, dc, dist + 1);
+                    }
+                    else if ((Math.Abs(dr) == 1 && Math.Abs(dc) == 1))
+                    {
+                        if (piece == "q" || piece == "b")
+                            return true;
+
+                        if (dist == 1 && piece == "k")
+                            return true;
+
+                        if (dist == 1 && piece == "p" && dr == -1)
+                            return true;
+
+                        if (piece == " ")
+                            return KingInCheck(king, pos, r + dr, c + dc, dr, dc, dist + 1);
+                    }
+                }
+                else if(king == "k")
+                {
+                    if (((Math.Abs(dr) == 1 && Math.Abs(dc) == 2) || (Math.Abs(dr) == 2 && Math.Abs(dc) == 1)) && piece == "N")
+                        return true;
+
+                    if ((dr == 0 && Math.Abs(dc) == 1) || (Math.Abs(dr) == 1 && dc == 0))
+                    {
+                        if (piece == "Q" || piece == "R")
+                            return true;
+
+                        if (dist == 1 && piece == "K")
+                            return true;
+
+                        if (piece == " ")
+                            return KingInCheck(king, pos, r + dr, c + dc, dr, dc, dist + 1);
+                    }
+                    else if ((Math.Abs(dr) == 1 && Math.Abs(dc) == 1))
+                    {
+                        if (piece == "Q" || piece == "B")
+                            return true;
+
+                        if (dist == 1 && piece == "K")
+                            return true;
+
+                        if (dist == 1 && piece == "P" && dr == 1)
+                            return true;
+
+                        if (piece == " ")
+                            return KingInCheck(king, pos, r + dr, c + dc, dr, dc, dist + 1);
+                    }
+                }
+            }
+
+            return false;
         }
 
         // Check if the piece [pc] at position [pos] can move to position [r, c]
@@ -296,6 +484,11 @@ namespace Originsoft
                                 return (pos + pot) + " ";
                             }
                         }
+                        else if(Math.Abs(dc) == 1 && Opponent(cpc))
+                        {
+                            if ((dr == -1 && pc == "P" && WhiteToMove) || (dr == 1 && pc == "p" && !WhiteToMove))
+                                return (pos + pot) + " ";
+                        }
                     }
 
                     break;                    
@@ -423,7 +616,8 @@ namespace Originsoft
         {
             var from = ToCoordinates(move.Substring(0, 2));
             var to = ToCoordinates(move.Substring(2, 2));
-            
+            var piece = GetPiece(from);
+
             if(move.Length == 4)
             {
                 if(!DoCastling(from, to))
@@ -431,10 +625,23 @@ namespace Originsoft
                     SetPiece(to, GetPiece(from));
                     SetPiece(from, " ");
                 }
+
+                if (piece == "K")
+                {
+                    CWK = false;
+                    CWQ = false;
+                }
+
+                if (piece == "k")
+                {
+                    CBK = false;
+                    CBQ = false;
+                }
             }
             if(move.Length == 5)
             {
-                SetPiece(to, move.Substring(4, 1));
+                var toPiece = (WhiteToMove) ? move.Substring(4, 1).ToUpper() : move.Substring(4, 1).ToLower();
+                SetPiece(to, toPiece);
                 SetPiece(from, " ");
             }
 
@@ -529,6 +736,9 @@ namespace Originsoft
                 }
                 
             }
+
+            CB = !(CBQ || CBK);
+            CW = !(CWQ || CWK);
         }
     }
 }

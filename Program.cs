@@ -103,7 +103,6 @@ namespace Originsoft
         }
         public static void inputQuit()
         {
-            
         }
         public static void inputPrint()
         {
