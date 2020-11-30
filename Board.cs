@@ -7,6 +7,7 @@ namespace Originsoft
 {
     public static class Board
     {
+        
         public static String[,] ChessBoard { get; set; } = new String[8, 8]{
                 {"r","n","b","q","k","b","n","r"},
                 {"p","p","p","p","p","p","p","p"},
@@ -17,6 +18,7 @@ namespace Originsoft
                 {"P","P","P","P","P","P","P","P"},
                 {"R","N","B","Q","K","B","N","R"}};
 
+        public static string LastMove { get; set; } = "";
         public static Boolean WhiteToMove { get; set; } = false;
         public static Boolean CWK { get; set; } = false;
         public static Boolean CWQ { get; set; } = false;
@@ -89,7 +91,7 @@ namespace Originsoft
             var _CBQ = CBQ;
             var _CB = CB;
             var _CW = CW;
-
+            var _LastMove = LastMove;
             var clonedBoard = (String[,])ChessBoard.Clone();
 
             MakeMove(move);
@@ -127,6 +129,7 @@ namespace Originsoft
             CBQ = _CBQ;
             CB = _CB;
             CW = _CW;
+            LastMove = _LastMove;
 
             return possible;
         }
@@ -489,6 +492,60 @@ namespace Originsoft
                             if ((dr == -1 && pc == "P" && WhiteToMove) || (dr == 1 && pc == "p" && !WhiteToMove))
                                 return (pos + pot) + " ";
                         }
+                        else if (Math.Abs(dc) == 1 && (cpc == " "))
+                        {
+                            if ((dr == -1 && pc == "P" && WhiteToMove))
+                            {
+                                if(dc == 1)
+                                {
+                                    if( (pos == "a5" && LastMove == "b7b5") ||
+                                        (pos == "b5" && LastMove == "c7c5") ||
+                                        (pos == "c5" && LastMove == "d7d5") ||
+                                        (pos == "d5" && LastMove == "e7e5") ||
+                                        (pos == "e5" && LastMove == "f7f5") ||
+                                        (pos == "f5" && LastMove == "g7g5") ||
+                                        (pos == "g5" && LastMove == "h7h5") )
+                                        return (pos + pot) + " ";
+                                }
+                                else if(dc == -1)
+                                {
+                                    if ((pos == "b5" && LastMove == "a7a5") ||
+                                        (pos == "c5" && LastMove == "b7b5") ||
+                                        (pos == "d5" && LastMove == "c7c5") ||
+                                        (pos == "e5" && LastMove == "d7d5") ||
+                                        (pos == "f5" && LastMove == "e7e5") ||
+                                        (pos == "g5" && LastMove == "f7f5") ||
+                                        (pos == "h5" && LastMove == "g7g5"))
+                                        return (pos + pot) + " ";
+                                }
+                            }
+                                
+                            if ((dr == 1 && pc == "p" && !WhiteToMove))
+                            {
+                                if (dc == 1)
+                                {
+                                    if ((pos == "a4" && LastMove == "b2b4") ||
+                                        (pos == "b4" && LastMove == "c2c4") ||
+                                        (pos == "c4" && LastMove == "d2d4") ||
+                                        (pos == "d4" && LastMove == "e2e4") ||
+                                        (pos == "e4" && LastMove == "f2f4") ||
+                                        (pos == "f4" && LastMove == "g2g4") ||
+                                        (pos == "g4" && LastMove == "h2h4"))
+                                        return (pos + pot) + " ";
+                                }
+                                else if (dc == -1)
+                                {
+                                    if ((pos == "b4" && LastMove == "a2a4") ||
+                                        (pos == "c4" && LastMove == "b2b4") ||
+                                        (pos == "d4" && LastMove == "c2c4") ||
+                                        (pos == "e4" && LastMove == "d2d4") ||
+                                        (pos == "f4" && LastMove == "e2e4") ||
+                                        (pos == "g4" && LastMove == "f2f4") ||
+                                        (pos == "h4" && LastMove == "g2g4"))
+                                        return (pos + pot) + " ";
+                                }
+                            }
+                        }
                     }
 
                     break;                    
@@ -529,6 +586,134 @@ namespace Originsoft
             return Tuple.Create<int, int>(row, col);
         }
 
+        public static Boolean CapturePawnPassant(Tuple<int, int> _from, Tuple<int, int> _to)
+        {
+            var from = FromCoordinates(_from);
+            var to = FromCoordinates(_to);
+
+            if (WhiteToMove)
+            {
+                if(from == "a5" && to == "b6" && GetPiece(from) == "P" && LastMove == "b7b5" && GetPiece("b5") == "p")
+                {
+                    SetPiece("a5", " ");SetPiece("b5", " ");SetPiece("b6", "P"); return true;
+                }
+                if(from == "b5" && to == "c6" && GetPiece(from) == "P" && LastMove == "c7c5" && GetPiece("c5") == "p")
+                {
+                    SetPiece("b5", " "); SetPiece("c5", " "); SetPiece("c6", "P"); return true;
+                }
+                if (from == "c5" && to == "d6" && GetPiece(from) == "P" && LastMove == "d7d5" && GetPiece("d5") == "p")
+                {
+                    SetPiece("c5", " "); SetPiece("d5", " "); SetPiece("d6", "P"); return true;
+                }
+                if (from == "d5" && to == "e6" && GetPiece(from) == "P" && LastMove == "e7e5" && GetPiece("e5") == "p")
+                {
+                    SetPiece("d5", " "); SetPiece("e5", " "); SetPiece("e6", "P"); return true;
+                }
+                if (from == "e5" && to == "f6" && GetPiece(from) == "P" && LastMove == "f7f5" && GetPiece("f5") == "p")
+                {
+                    SetPiece("e5", " "); SetPiece("f5", " "); SetPiece("f6", "P"); return true;
+                }
+                if (from == "f5" && to == "g6" && GetPiece(from) == "P" && LastMove == "g7g5" && GetPiece("g5") == "p")
+                {
+                    SetPiece("f5", " "); SetPiece("g5", " "); SetPiece("g6", "P"); return true;
+                }
+                if (from == "g5" && to == "h6" && GetPiece(from) == "P" && LastMove == "h7h5" && GetPiece("h5") == "p")
+                {
+                    SetPiece("g5", " "); SetPiece("h5", " "); SetPiece("h6", "P"); return true;
+                }
+
+                if (from == "b5" && to == "a6" && GetPiece(from) == "P" && LastMove == "a7a5" && GetPiece("a5") == "p")
+                {
+                    SetPiece("b5", " "); SetPiece("a5", " "); SetPiece("a6", "P"); return true;
+                }
+                if (from == "c5" && to == "b6" && GetPiece(from) == "P" && LastMove == "b7b5" && GetPiece("b5") == "p")
+                {
+                    SetPiece("c5", " "); SetPiece("b5", " "); SetPiece("b6", "P"); return true;
+                }
+                if (from == "d5" && to == "c6" && GetPiece(from) == "P" && LastMove == "c7c5" && GetPiece("c5") == "p")
+                {
+                    SetPiece("d5", " "); SetPiece("c5", " "); SetPiece("c6", "P"); return true;
+                }
+                if (from == "e5" && to == "d6" && GetPiece(from) == "P" && LastMove == "d7d5" && GetPiece("d5") == "p")
+                {
+                    SetPiece("e5", " "); SetPiece("d5", " "); SetPiece("d6", "P"); return true;
+                }
+                if (from == "f5" && to == "e6" && GetPiece(from) == "P" && LastMove == "e7e5" && GetPiece("e5") == "p")
+                {
+                    SetPiece("f5", " "); SetPiece("e5", " "); SetPiece("e6", "P"); return true;
+                }
+                if (from == "g5" && to == "f6" && GetPiece(from) == "P" && LastMove == "f7f5" && GetPiece("f5") == "p")
+                {
+                    SetPiece("g5", " "); SetPiece("f5", " "); SetPiece("f6", "P"); return true;
+                }
+                if (from == "h5" && to == "g6" && GetPiece(from) == "P" && LastMove == "g7g5" && GetPiece("g5") == "p")
+                {
+                    SetPiece("h5", " "); SetPiece("g5", " "); SetPiece("g6", "P"); return true;
+                }
+            }
+            else
+            {
+                if (from == "a4" && to == "b3" && GetPiece(from) == "p" && LastMove == "b2b4" && GetPiece("b4") == "P")
+                {
+                    SetPiece("a4", " "); SetPiece("b4", " "); SetPiece("b3", "p"); return true;
+                }
+                if (from == "b4" && to == "c3" && GetPiece(from) == "p" && LastMove == "c2c4" && GetPiece("c4") == "P")
+                {
+                    SetPiece("b4", " "); SetPiece("c4", " "); SetPiece("c3", "p"); return true;
+                }
+                if (from == "c4" && to == "d3" && GetPiece(from) == "p" && LastMove == "d2d4" && GetPiece("d4") == "P")
+                {
+                    SetPiece("c4", " "); SetPiece("d4", " "); SetPiece("d3", "p"); return true;
+                }
+                if (from == "d4" && to == "e3" && GetPiece(from) == "p" && LastMove == "e2e4" && GetPiece("e4") == "P")
+                {
+                    SetPiece("d4", " "); SetPiece("e4", " "); SetPiece("e3", "p"); return true;
+                }
+                if (from == "e4" && to == "f3" && GetPiece(from) == "p" && LastMove == "f2f4" && GetPiece("f4") == "P")
+                {
+                    SetPiece("e4", " "); SetPiece("f4", " "); SetPiece("f3", "p"); return true;
+                }
+                if (from == "f4" && to == "g3" && GetPiece(from) == "p" && LastMove == "g2g4" && GetPiece("g4") == "P")
+                {
+                    SetPiece("f4", " "); SetPiece("g4", " "); SetPiece("g3", "p"); return true;
+                }
+                if (from == "g4" && to == "h3" && GetPiece(from) == "p" && LastMove == "h2h4" && GetPiece("h4") == "P")
+                {
+                    SetPiece("g4", " "); SetPiece("h4", " "); SetPiece("h3", "p"); return true;
+                }
+
+                if (from == "b4" && to == "a3" && GetPiece(from) == "p" && LastMove == "a2a4" && GetPiece("a4") == "P")
+                {
+                    SetPiece("b4", " "); SetPiece("a4", " "); SetPiece("a3", "p"); return true;
+                }
+                if (from == "c4" && to == "b3" && GetPiece(from) == "p" && LastMove == "b2b4" && GetPiece("b4") == "P")
+                {
+                    SetPiece("c4", " "); SetPiece("b4", " "); SetPiece("b3", "p"); return true;
+                }
+                if (from == "d4" && to == "c3" && GetPiece(from) == "p" && LastMove == "c2c4" && GetPiece("c4") == "P")
+                {
+                    SetPiece("d4", " "); SetPiece("c4", " "); SetPiece("c3", "p"); return true;
+                }
+                if (from == "e4" && to == "d3" && GetPiece(from) == "p" && LastMove == "d2d4" && GetPiece("d4") == "P")
+                {
+                    SetPiece("e4", " "); SetPiece("d4", " "); SetPiece("d3", "p"); return true;
+                }
+                if (from == "f4" && to == "e3" && GetPiece(from) == "p" && LastMove == "e2e4" && GetPiece("e4") == "P")
+                {
+                    SetPiece("f4", " "); SetPiece("e4", " "); SetPiece("e3", "p"); return true;
+                }
+                if (from == "g4" && to == "f3" && GetPiece(from) == "p" && LastMove == "f2f4" && GetPiece("f4") == "P")
+                {
+                    SetPiece("g4", " "); SetPiece("f4", " "); SetPiece("f3", "p"); return true;
+                }
+                if (from == "h4" && to == "g3" && GetPiece(from) == "p" && LastMove == "g2g4" && GetPiece("g4") == "P")
+                {
+                    SetPiece("h4", " "); SetPiece("g4", " "); SetPiece("g3", "p"); return true;
+                }
+            }
+
+            return false;
+        }
         public static Boolean DoCastling(Tuple<int, int> from, Tuple<int, int> to)
         {
             var king = GetPiece(from);
@@ -597,6 +782,11 @@ namespace Originsoft
             ChessBoard[at.Item1, at.Item2] = piece;
         }
 
+        public static void SetPiece(string pos, string piece)
+        {
+            SetPiece(ToCoordinates(pos), piece);
+        }
+
         public static string GetPiece(Tuple<int, int> at)
         {
             return ChessBoard[at.Item1, at.Item2];
@@ -620,7 +810,7 @@ namespace Originsoft
 
             if(move.Length == 4)
             {
-                if(!DoCastling(from, to))
+                if(!CapturePawnPassant(from, to) && !DoCastling(from, to))
                 {
                     SetPiece(to, GetPiece(from));
                     SetPiece(from, " ");
@@ -645,6 +835,8 @@ namespace Originsoft
                 SetPiece(from, " ");
             }
 
+            LastMove = move;
+            
             WhiteToMove = !WhiteToMove;
             return true;
         }
