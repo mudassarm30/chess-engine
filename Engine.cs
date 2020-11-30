@@ -2,80 +2,86 @@
 
 namespace Originsoft
 {
-    class Program
+    class Engine
     {
         private static string ENGINENAME = "Originsoft";
         private static string AUTHOR = "Mudassar";
+        private Board board = null;
+        public Engine()
+        {
+            board = new Board();
+        }
 
         static void Main(string[] args)
         {
+            Engine engine = new Engine();
 
             while (true)
             {
                 String inputString = Console.ReadLine();
                 if ("uci".Equals(inputString))
                 {
-                    inputUCI();
+                    engine.InputUCI();
                 }
                 else if (inputString.StartsWith("setoption"))
                 {
-                    inputSetOption(inputString);
+                    engine.InputSetOption(inputString);
                 }
                 else if ("isready".Equals(inputString))
                 {
-                    inputIsReady();
+                    engine.InputIsReady();
                 }
                 else if ("ucinewgame".Equals(inputString))
                 {
-                    inputUCINewGame();
+                    engine.InputUCINewGame();
                 }
                 else if (inputString.StartsWith("position"))
                 {
-                    inputPosition(inputString);
-                    Board.Print();
+                    engine.InputPosition(inputString);
+                    engine.board.Print();
                 }
                 else if (inputString.StartsWith("go"))
                 {
-                    inputGo();
+                    engine.InputGo();
                 }
                 else if (inputString.Equals("quit"))
                 {
-                    inputQuit();
+                    engine.InputQuit();
                 }
                 else if ("print".Equals(inputString))
                 {
-                    inputPrint();
+                    engine.InputPrint();
                 }
             }
         }
-        public static void inputUCI()
+        public void InputUCI()
         {
             Console.WriteLine("id name " + ENGINENAME);
             Console.WriteLine("id author " + AUTHOR);
             Console.WriteLine("uciok");
         }
-        public static void inputSetOption(String inputString)
+        public void InputSetOption(String inputString)
         {
         }
-        public static void inputIsReady()
+        public void InputIsReady()
         {
             Console.WriteLine("readyok");
         }
-        public static void inputUCINewGame()
+        public void InputUCINewGame()
         {
         }
-        public static void inputPosition(String input)
+        public void InputPosition(String input)
         {
             String[] tokens = input.Split(" ");
             
             if(tokens[1] == "startpos")
             {
-                Board.ImportFEN("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
+                board.ImportFEN("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
             }
             else if(tokens[1] == "fen")
             {
                 input = input.Substring(tokens[0].Length + tokens[1].Length + 2);
-                Board.ImportFEN(input);
+                board.ImportFEN(input);
             }
 
             if (tokens.Length <= 2)
@@ -86,27 +92,27 @@ namespace Originsoft
                 for(var m = 3; m < tokens.Length; m++)
                 {
                     var move = tokens[m];
-                    Board.MakeMove(move);
+                    board.MakeMove(move);
                 }
             }
         }
-        public static void inputGo()
+        public void InputGo()
         {
-            var strmoves = Board.GetAllPossibleMoves();
+            var strmoves = board.GetAllPossibleMoves();
             var moves = strmoves.Split(" ");
             var rand = new Random(DateTimeOffset.UtcNow.Millisecond);
             var move = moves[rand.Next(0, moves.Length)];
-            Board.MakeMove(move);
+            board.MakeMove(move);
             Console.WriteLine("info possible moves: " + strmoves);
             Console.WriteLine("bestmove " + move);
-            Board.Print();
+            board.Print();
         }
-        public static void inputQuit()
+        public void InputQuit()
         {
         }
-        public static void inputPrint()
+        public void InputPrint()
         {
-            Board.Print();
+            board.Print();
         }
     }
 }

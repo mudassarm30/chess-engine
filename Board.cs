@@ -5,10 +5,10 @@ using System.Text;
 
 namespace Originsoft
 {
-    public static class Board
+    public class Board
     {
-        
-        public static String[,] ChessBoard { get; set; } = new String[8, 8]{
+
+        public String[,] ChessBoard { get; set; } = new String[8, 8]{
                 {"r","n","b","q","k","b","n","r"},
                 {"p","p","p","p","p","p","p","p"},
                 {" "," "," "," "," "," "," "," "},
@@ -18,22 +18,22 @@ namespace Originsoft
                 {"P","P","P","P","P","P","P","P"},
                 {"R","N","B","Q","K","B","N","R"}};
 
-        public static string LastMove { get; set; } = "";
-        public static Boolean WhiteToMove { get; set; } = false;
-        public static Boolean CWK { get; set; } = false;
-        public static Boolean CWQ { get; set; } = false;
-        public static Boolean CBK { get; set; } = false;
-        public static Boolean CBQ { get; set; } = false;
-        public static Boolean CB { get; set; } = false;
-        public static Boolean CW { get; set; } = false;
+        public string LastMove { get; set; } = "";
+        public Boolean WhiteToMove { get; set; } = false;
+        public Boolean CWK { get; set; } = false;
+        public Boolean CWQ { get; set; } = false;
+        public Boolean CBK { get; set; } = false;
+        public Boolean CBQ { get; set; } = false;
+        public Boolean CB { get; set; } = false;
+        public Boolean CW { get; set; } = false;
 
-        public static void Print()
+        public void Print()
         {
             Console.WriteLine("");
-            for(var r = 0; r < 8; r++)
+            for (var r = 0; r < 8; r++)
             {
                 Console.Write("info [");
-                for(var c = 0; c < 8; c++)
+                for (var c = 0; c < 8; c++)
                 {
                     Console.Write(ChessBoard[r, c]);
                     if (c < 7)
@@ -43,18 +43,18 @@ namespace Originsoft
             }
         }
 
-        public static string GetAllPossibleMoves()
+        public string GetAllPossibleMoves()
         {
             var possibilities = "";
-            for(var r = 0; r < 8; r++)
+            for (var r = 0; r < 8; r++)
             {
-                for(var c = 0; c < 8; c++)
+                for (var c = 0; c < 8; c++)
                 {
                     var position = FromCoordinates(r, c);
                     var piece = GetPiece(r, c);
                     var opponent = Opponent(piece);
 
-                    if(piece != " " && !opponent)
+                    if (piece != " " && !opponent)
                     {
                         possibilities += PieceMoves(piece, position, r, c, 0, 0);
                     }
@@ -64,16 +64,16 @@ namespace Originsoft
             return FilterPossibleMoves(possibilities.Trim()).Trim();
         }
 
-        private static string FilterPossibleMoves(string moves)
+        private string FilterPossibleMoves(string moves)
         {
             var possibleMoves = moves.Split(" ");
             var filteredMoves = "";
 
-            foreach(var possibleMove in possibleMoves)
+            foreach (var possibleMove in possibleMoves)
             {
                 var move = possibleMove.Trim();
 
-                if(TryMove(move))
+                if (TryMove(move))
                 {
                     filteredMoves += (move + " ");
                 }
@@ -82,7 +82,7 @@ namespace Originsoft
             return filteredMoves;
         }
 
-        private static Boolean TryMove(string move)
+        private Boolean TryMove(string move)
         {
             var _WhiteToMove = WhiteToMove;
             var _CWK = CWK;
@@ -100,8 +100,8 @@ namespace Originsoft
 
             if ((_WhiteToMove && KingInCheck("K")) || !_WhiteToMove && KingInCheck("k"))
                 possible = false;
-            
-            switch(move)
+
+            switch (move)
             {
                 case "e1g1":
                     if (KingInCheck("K", "e1") || KingInCheck("K", "f1") || KingInCheck("K", "g1"))
@@ -120,7 +120,7 @@ namespace Originsoft
                         possible = false;
                     break;
             }
-            
+
             ChessBoard = clonedBoard;
             WhiteToMove = _WhiteToMove;
             CWK = _CWK;
@@ -134,7 +134,7 @@ namespace Originsoft
             return possible;
         }
 
-        public static Boolean KingInCheck(string king)
+        public Boolean KingInCheck(string king)
         {
             for (var r = 0; r < 8; r++)
             {
@@ -143,7 +143,7 @@ namespace Originsoft
                     var position = FromCoordinates(r, c);
                     var piece = GetPiece(r, c);
 
-                    if(king == piece)
+                    if (king == piece)
                     {
                         return KingInCheck(king, position, r, c, 0, 0, 0);
                     }
@@ -153,13 +153,13 @@ namespace Originsoft
             return false;
         }
 
-        private static Boolean KingInCheck(string king, string pos)
+        private Boolean KingInCheck(string king, string pos)
         {
             var coords = ToCoordinates(pos);
             return KingInCheck(king, pos, coords.Item1, coords.Item2, 0, 0, 0);
         }
 
-        private static Boolean KingInCheck(string king, string pos, int r, int c, int dr, int dc, int dist)
+        private Boolean KingInCheck(string king, string pos, int r, int c, int dr, int dc, int dist)
         {
 
             if (r < 0 || r > 7 || c < 0 || c > 7)
@@ -167,7 +167,7 @@ namespace Originsoft
 
             var pot = FromCoordinates(r, c);
 
-            if(pos == pot)
+            if (pos == pot)
             {
                 return KingInCheck(king, pos, r + 1, c, 1, 0, dist + 1) || KingInCheck(king, pos, r - 1, c, -1, 0, dist + 1) ||
                        KingInCheck(king, pos, r, c + 1, 0, 1, dist + 1) || KingInCheck(king, pos, r, c - 1, 0, -1, dist + 1) ||
@@ -185,12 +185,12 @@ namespace Originsoft
             {
                 var piece = GetPiece(pot);
 
-                if(king == "K")
+                if (king == "K")
                 {
                     if (((Math.Abs(dr) == 1 && Math.Abs(dc) == 2) || (Math.Abs(dr) == 2 && Math.Abs(dc) == 1)) && piece == "n")
                         return true;
 
-                    if((dr == 0 && Math.Abs(dc) == 1) || (Math.Abs(dr) == 1 && dc == 0))
+                    if ((dr == 0 && Math.Abs(dc) == 1) || (Math.Abs(dr) == 1 && dc == 0))
                     {
                         if (piece == "q" || piece == "r")
                             return true;
@@ -216,7 +216,7 @@ namespace Originsoft
                             return KingInCheck(king, pos, r + dr, c + dc, dr, dc, dist + 1);
                     }
                 }
-                else if(king == "k")
+                else if (king == "k")
                 {
                     if (((Math.Abs(dr) == 1 && Math.Abs(dc) == 2) || (Math.Abs(dr) == 2 && Math.Abs(dc) == 1)) && piece == "N")
                         return true;
@@ -259,7 +259,7 @@ namespace Originsoft
         //
         //       1) Moving a piece may cause the king to get checked
         //       2) May be the piece is the king and new position is on check.
-        private static string PieceMoves(string pc, string pos, int r, int c, int dr, int dc)
+        private string PieceMoves(string pc, string pos, int r, int c, int dr, int dc)
         {
 
             // During recursion, check if we moved out of board,
@@ -270,7 +270,7 @@ namespace Originsoft
 
             // The potential position [pot] where move possibility is being checked
             var pot = FromCoordinates(r, c);
-            
+
             // The piece (or empty place) at the position [pot]
             var cpc = GetPiece(r, c);
 
@@ -279,14 +279,14 @@ namespace Originsoft
                 case "r":
                 case "R":
 
-                    if(pos == pot)
+                    if (pos == pot)
                     {
                         // First entry in the recursion, so we will move in four directions 
                         // horizontally and vertically, both directions and will collect all possible moves
 
                         return PieceMoves(pc, pos, r + 1, c, 1, 0) + PieceMoves(pc, pos, r - 1, c, -1, 0) +
                                PieceMoves(pc, pos, r, c + 1, 0, 1) + PieceMoves(pc, pos, r, c - 1, 0, -1);
-                        
+
                     }
                     else
                     {
@@ -294,7 +294,7 @@ namespace Originsoft
                         // add that move possibility and go in the same direction
                         // here dr and dc will help us to keep the same direction
 
-                        if(cpc == " ")
+                        if (cpc == " ")
                         {
                             return (pos + pot) + " " + PieceMoves(pc, pos, r + dr, c + dc, dr, dc);
                         }
@@ -302,7 +302,7 @@ namespace Originsoft
                         // If the piece [cpc] is from opposite side
                         // add that move possibility and stop the recursion
 
-                        else if(Opponent(cpc))
+                        else if (Opponent(cpc))
                         {
                             return (pos + pot) + " ";
                         }
@@ -432,7 +432,7 @@ namespace Originsoft
                                 return "";
 
                             if ((!CW && pos == "e1" && dc == 2 && CWK && WhiteToMove && GetPiece("f1") == " " && GetPiece("g1") == " ") || (!CW && pos == "e1" && dc == -2 && CWQ && WhiteToMove && GetPiece("d1") == " " && GetPiece("c1") == " " && GetPiece("b1") == " ") ||
-                                (!CB && pos == "e8" && dc == 2 && CBK && !WhiteToMove && GetPiece("f8") == " " && GetPiece("g8") == " ") || (!CB && pos == "e8" && dc == -2 && CBQ && !WhiteToMove && GetPiece("d8") == " " && GetPiece("c8") == " " && GetPiece("b8") == " ") )
+                                (!CB && pos == "e8" && dc == 2 && CBK && !WhiteToMove && GetPiece("f8") == " " && GetPiece("g8") == " ") || (!CB && pos == "e8" && dc == -2 && CBQ && !WhiteToMove && GetPiece("d8") == " " && GetPiece("c8") == " " && GetPiece("b8") == " "))
                                 return (pos + pot) + " ";
 
                             return "";
@@ -461,7 +461,7 @@ namespace Originsoft
                         // First entry in the recursion, check if black (dir = 1) or white (dir = -1) pawn can move one or two boxes
                         // or if it can capture diagonally in each diagonal direction
 
-                        return PieceMoves(pc, pos, r + dir, c, dir, 0) + PieceMoves(pc, pos, r + dir*2, c, dir*2, 0) +
+                        return PieceMoves(pc, pos, r + dir, c, dir, 0) + PieceMoves(pc, pos, r + dir * 2, c, dir * 2, 0) +
                                PieceMoves(pc, pos, r + dir, c + 1, dir, 1) + PieceMoves(pc, pos, r + dir, c - 1, dir, -1);
 
                     }
@@ -477,7 +477,7 @@ namespace Originsoft
                                 return (pos + pot) + " ";
                             }
                         }
-                        else if (Math.Abs(dr) == 2 && dc == 0 && GetPiece(r - dir, c) == " " && (((r - 2*dir) == 6 && WhiteToMove) || ((r - 2 * dir) == 1 && !WhiteToMove)))
+                        else if (Math.Abs(dr) == 2 && dc == 0 && GetPiece(r - dir, c) == " " && (((r - 2 * dir) == 6 && WhiteToMove) || ((r - 2 * dir) == 1 && !WhiteToMove)))
                         {
                             // If the box at place [r, c] is empty,
                             // add that move possibility stop recursion
@@ -487,7 +487,7 @@ namespace Originsoft
                                 return (pos + pot) + " ";
                             }
                         }
-                        else if(Math.Abs(dc) == 1 && Opponent(cpc))
+                        else if (Math.Abs(dc) == 1 && Opponent(cpc))
                         {
                             if ((dr == -1 && pc == "P" && WhiteToMove) || (dr == 1 && pc == "p" && !WhiteToMove))
                                 return (pos + pot) + " ";
@@ -496,18 +496,18 @@ namespace Originsoft
                         {
                             if ((dr == -1 && pc == "P" && WhiteToMove))
                             {
-                                if(dc == 1)
+                                if (dc == 1)
                                 {
-                                    if( (pos == "a5" && LastMove == "b7b5") ||
+                                    if ((pos == "a5" && LastMove == "b7b5") ||
                                         (pos == "b5" && LastMove == "c7c5") ||
                                         (pos == "c5" && LastMove == "d7d5") ||
                                         (pos == "d5" && LastMove == "e7e5") ||
                                         (pos == "e5" && LastMove == "f7f5") ||
                                         (pos == "f5" && LastMove == "g7g5") ||
-                                        (pos == "g5" && LastMove == "h7h5") )
+                                        (pos == "g5" && LastMove == "h7h5"))
                                         return (pos + pot) + " ";
                                 }
-                                else if(dc == -1)
+                                else if (dc == -1)
                                 {
                                     if ((pos == "b5" && LastMove == "a7a5") ||
                                         (pos == "c5" && LastMove == "b7b5") ||
@@ -519,7 +519,7 @@ namespace Originsoft
                                         return (pos + pot) + " ";
                                 }
                             }
-                                
+
                             if ((dr == 1 && pc == "p" && !WhiteToMove))
                             {
                                 if (dc == 1)
@@ -548,13 +548,13 @@ namespace Originsoft
                         }
                     }
 
-                    break;                    
+                    break;
             }
 
             return "";
         }
 
-        public static Boolean Opponent(string p)
+        public Boolean Opponent(string p)
         {
             if (p == " ")
                 return false;
@@ -568,17 +568,17 @@ namespace Originsoft
             return true;
         }
 
-        public static string FromCoordinates(int row, int col)
+        public string FromCoordinates(int row, int col)
         {
             return ((char)('a' + col)).ToString() + ((char)((8 - row) + '0')).ToString();
         }
 
-        public static string FromCoordinates(Tuple<int, int> coordinates)
+        public string FromCoordinates(Tuple<int, int> coordinates)
         {
             return FromCoordinates(coordinates.Item1, coordinates.Item2);
         }
 
-        public static Tuple<int, int> ToCoordinates(String pos)   
+        public Tuple<int, int> ToCoordinates(String pos)
         {
             int col = pos.ToCharArray()[0] - 'a';
             int row = 8 - (pos.ToCharArray()[1] - '0');
@@ -586,18 +586,18 @@ namespace Originsoft
             return Tuple.Create<int, int>(row, col);
         }
 
-        public static Boolean CapturePawnPassant(Tuple<int, int> _from, Tuple<int, int> _to)
+        public Boolean CapturePawnPassant(Tuple<int, int> _from, Tuple<int, int> _to)
         {
             var from = FromCoordinates(_from);
             var to = FromCoordinates(_to);
 
             if (WhiteToMove)
             {
-                if(from == "a5" && to == "b6" && GetPiece(from) == "P" && LastMove == "b7b5" && GetPiece("b5") == "p")
+                if (from == "a5" && to == "b6" && GetPiece(from) == "P" && LastMove == "b7b5" && GetPiece("b5") == "p")
                 {
-                    SetPiece("a5", " ");SetPiece("b5", " ");SetPiece("b6", "P"); return true;
+                    SetPiece("a5", " "); SetPiece("b5", " "); SetPiece("b6", "P"); return true;
                 }
-                if(from == "b5" && to == "c6" && GetPiece(from) == "P" && LastMove == "c7c5" && GetPiece("c5") == "p")
+                if (from == "b5" && to == "c6" && GetPiece(from) == "P" && LastMove == "c7c5" && GetPiece("c5") == "p")
                 {
                     SetPiece("b5", " "); SetPiece("c5", " "); SetPiece("c6", "P"); return true;
                 }
@@ -714,7 +714,7 @@ namespace Originsoft
 
             return false;
         }
-        public static Boolean DoCastling(Tuple<int, int> from, Tuple<int, int> to)
+        public Boolean DoCastling(Tuple<int, int> from, Tuple<int, int> to)
         {
             var king = GetPiece(from);
             if (Math.Abs(from.Item2 - to.Item2) == 2 && ((WhiteToMove && king == "K") || (!WhiteToMove && king == "k")))
@@ -722,7 +722,7 @@ namespace Originsoft
                 SetPiece(to, king);
                 SetPiece(from, " ");
 
-                if(to.Item2 > from.Item2)
+                if (to.Item2 > from.Item2)
                 {
                     var rookAt = Tuple.Create<int, int>(from.Item1, 7);
                     var rook = GetPiece(rookAt);
@@ -731,7 +731,7 @@ namespace Originsoft
                     var rookNewAt = Tuple.Create<int, int>(from.Item1, (from.Item2 + to.Item2) / 2);
                     SetPiece(rookNewAt, rook);
 
-                    if(Math.Abs(from.Item2 - 7) == 3)
+                    if (Math.Abs(from.Item2 - 7) == 3)
                     {
                         if (WhiteToMove)
                             CWK = false;
@@ -777,40 +777,40 @@ namespace Originsoft
             return false;
         }
 
-        public static void SetPiece(Tuple<int, int> at, string piece)
+        public void SetPiece(Tuple<int, int> at, string piece)
         {
             ChessBoard[at.Item1, at.Item2] = piece;
         }
 
-        public static void SetPiece(string pos, string piece)
+        public void SetPiece(string pos, string piece)
         {
             SetPiece(ToCoordinates(pos), piece);
         }
 
-        public static string GetPiece(Tuple<int, int> at)
+        public string GetPiece(Tuple<int, int> at)
         {
             return ChessBoard[at.Item1, at.Item2];
         }
 
-        public static string GetPiece(string pos)
+        public string GetPiece(string pos)
         {
             return GetPiece(ToCoordinates(pos));
         }
 
-        public static string GetPiece(int row, int col)
+        public string GetPiece(int row, int col)
         {
             return ChessBoard[row, col];
         }
 
-        public static Boolean MakeMove(String move)
+        public Boolean MakeMove(String move)
         {
             var from = ToCoordinates(move.Substring(0, 2));
             var to = ToCoordinates(move.Substring(2, 2));
             var piece = GetPiece(from);
 
-            if(move.Length == 4)
+            if (move.Length == 4)
             {
-                if(!CapturePawnPassant(from, to) && !DoCastling(from, to))
+                if (!CapturePawnPassant(from, to) && !DoCastling(from, to))
                 {
                     SetPiece(to, GetPiece(from));
                     SetPiece(from, " ");
@@ -828,7 +828,7 @@ namespace Originsoft
                     CBQ = false;
                 }
             }
-            if(move.Length == 5)
+            if (move.Length == 5)
             {
                 var toPiece = (WhiteToMove) ? move.Substring(4, 1).ToUpper() : move.Substring(4, 1).ToLower();
                 SetPiece(to, toPiece);
@@ -836,12 +836,12 @@ namespace Originsoft
             }
 
             LastMove = move;
-            
+
             WhiteToMove = !WhiteToMove;
             return true;
         }
 
-        public static void ImportFEN(String input)
+        public void ImportFEN(String input)
         {
             input = input.Trim();
 
@@ -860,9 +860,9 @@ namespace Originsoft
             int col = 0;
             Boolean space = false;
 
-            foreach(var c in input)
+            foreach (var c in input)
             {
-                switch(c)
+                switch (c)
                 {
                     case 'r':
                     case 'R':
@@ -876,38 +876,38 @@ namespace Originsoft
                     case 'K':
                     case 'p':
                     case 'P':
-                    {
-                        if (!space)
                         {
-                            row = index / 8;
-                            col = index % 8;
-                            ChessBoard[row, col] = "" + c;
-                            index++;
-                        }
-                        else 
-                        {
-                            switch (c)
+                            if (!space)
                             {
-                                case '-':
-                                    break;
-                                case 'K':
-                                    CWK = true;
-                                    break;
-                                case 'Q':
-                                    CWQ = true;
-                                    break;
-                                case 'k':
-                                    CBK = true;
-                                    break;
-                                case 'q':
-                                    CBQ = true;
-                                    break;
-                                default:
-                                    break;
+                                row = index / 8;
+                                col = index % 8;
+                                ChessBoard[row, col] = "" + c;
+                                index++;
+                            }
+                            else
+                            {
+                                switch (c)
+                                {
+                                    case '-':
+                                        break;
+                                    case 'K':
+                                        CWK = true;
+                                        break;
+                                    case 'Q':
+                                        CWQ = true;
+                                        break;
+                                    case 'k':
+                                        CBK = true;
+                                        break;
+                                    case 'q':
+                                        CBQ = true;
+                                        break;
+                                    default:
+                                        break;
+                                }
                             }
                         }
-                    }
-                    break;
+                        break;
 
                     case '1': index += 1; break;
                     case '2': index += 2; break;
@@ -926,7 +926,7 @@ namespace Originsoft
 
                     default: break;
                 }
-                
+
             }
 
             CB = !(CBQ || CBK);
