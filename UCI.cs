@@ -2,19 +2,19 @@
 
 namespace Originsoft
 {
-    class Engine
+    class UCI
     {
         private static string ENGINENAME = "Originsoft";
         private static string AUTHOR = "Mudassar";
         private Board board = null;
-        public Engine()
+        public UCI()
         {
             board = new Board();
         }
 
         static void Main(string[] args)
         {
-            Engine engine = new Engine();
+            UCI engine = new UCI();
 
             while (true)
             {

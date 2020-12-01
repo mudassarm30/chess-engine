@@ -8,7 +8,7 @@ namespace Originsoft
     public class Board
     {
 
-        public String[,] ChessBoard { get; set; } = new String[8, 8]{
+        private String[,] ChessBoard { get; set; } = new String[8, 8]{
                 {"r","n","b","q","k","b","n","r"},
                 {"p","p","p","p","p","p","p","p"},
                 {" "," "," "," "," "," "," "," "},
@@ -554,7 +554,7 @@ namespace Originsoft
             return "";
         }
 
-        public Boolean Opponent(string p)
+        private Boolean Opponent(string p)
         {
             if (p == " ")
                 return false;
@@ -568,17 +568,17 @@ namespace Originsoft
             return true;
         }
 
-        public string FromCoordinates(int row, int col)
+        private string FromCoordinates(int row, int col)
         {
             return ((char)('a' + col)).ToString() + ((char)((8 - row) + '0')).ToString();
         }
 
-        public string FromCoordinates(Tuple<int, int> coordinates)
+        private string FromCoordinates(Tuple<int, int> coordinates)
         {
             return FromCoordinates(coordinates.Item1, coordinates.Item2);
         }
 
-        public Tuple<int, int> ToCoordinates(String pos)
+        private Tuple<int, int> ToCoordinates(String pos)
         {
             int col = pos.ToCharArray()[0] - 'a';
             int row = 8 - (pos.ToCharArray()[1] - '0');
@@ -586,7 +586,7 @@ namespace Originsoft
             return Tuple.Create<int, int>(row, col);
         }
 
-        public Boolean CapturePawnPassant(Tuple<int, int> _from, Tuple<int, int> _to)
+        private Boolean CapturePawnPassant(Tuple<int, int> _from, Tuple<int, int> _to)
         {
             var from = FromCoordinates(_from);
             var to = FromCoordinates(_to);
@@ -714,7 +714,7 @@ namespace Originsoft
 
             return false;
         }
-        public Boolean DoCastling(Tuple<int, int> from, Tuple<int, int> to)
+        private Boolean DoCastling(Tuple<int, int> from, Tuple<int, int> to)
         {
             var king = GetPiece(from);
             if (Math.Abs(from.Item2 - to.Item2) == 2 && ((WhiteToMove && king == "K") || (!WhiteToMove && king == "k")))
@@ -777,27 +777,27 @@ namespace Originsoft
             return false;
         }
 
-        public void SetPiece(Tuple<int, int> at, string piece)
+        private void SetPiece(Tuple<int, int> at, string piece)
         {
             ChessBoard[at.Item1, at.Item2] = piece;
         }
 
-        public void SetPiece(string pos, string piece)
+        private void SetPiece(string pos, string piece)
         {
             SetPiece(ToCoordinates(pos), piece);
         }
 
-        public string GetPiece(Tuple<int, int> at)
+        private string GetPiece(Tuple<int, int> at)
         {
             return ChessBoard[at.Item1, at.Item2];
         }
 
-        public string GetPiece(string pos)
+        private string GetPiece(string pos)
         {
             return GetPiece(ToCoordinates(pos));
         }
 
-        public string GetPiece(int row, int col)
+        private string GetPiece(int row, int col)
         {
             return ChessBoard[row, col];
         }
